@@ -4,8 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
 /**
@@ -29,7 +27,7 @@ public class BufferedScanner extends BufferedReader {
   /**
    * Creates a new <code>BufferedScanner</code> that will read from the file with the given path.
    * 
-   * @param String The path of the file to read from.
+   * @param path The path of the file to read from.
    */
   public BufferedScanner(String path) {
     super(new InputStreamReader(newFileInputStream(path)));
@@ -110,8 +108,8 @@ public class BufferedScanner extends BufferedReader {
    *         occurrence of an <code>IOException</code>.
    */
   public int readInt() {
-    AtomicBoolean negativeInt = new AtomicBoolean();
-    AtomicBoolean firstChar = new AtomicBoolean(true);
+    var negativeInt = new Wrapper<Boolean>(false);
+    var firstChar = new Wrapper<Boolean>(true);
 
     int next = read(0, (i, j) -> {
       // i is the current value read thus far, j is the next digit to add
@@ -143,10 +141,10 @@ public class BufferedScanner extends BufferedReader {
    *         the occurrence of an <code>IOException</code>.
    */
   public double readDouble() {
-    AtomicBoolean negativeDouble = new AtomicBoolean();
-    AtomicBoolean decimal = new AtomicBoolean();
-    AtomicReference<Double> decimalPow = new AtomicReference<Double>();
-    AtomicBoolean firstChar = new AtomicBoolean(true);
+    var negativeDouble = new Wrapper<Boolean>(false);
+    var decimal = new Wrapper<Boolean>(false);
+    var decimalPow = new Wrapper<Double>(0.0);
+    var firstChar = new Wrapper<Boolean>(true);
 
     double next = read(0.0, (i, j) -> {
       double result = i;
@@ -193,8 +191,8 @@ public class BufferedScanner extends BufferedReader {
    * @return An <code>int[]</code> of length <code>len</code> filled with the next <code>int</code>s
    *         in the <code>InputStream</code>.
    */
-  public int[] readInts(final int len) {
-    int[] a = new int[len];
+  public int[] readInts(int len) {
+    var a = new int[len];
     readInts(a);
     return a;
   }
@@ -211,13 +209,57 @@ public class BufferedScanner extends BufferedReader {
    * @return A matrix with m rows and n columns with the next m * n <code>int</code>s in the
    *         <code>InputStream</code>.
    */
-  public int[][] readIntMat(final int m, final int n) {
-    int[][] mat = new int[m][n];
-    for (int[] row : mat) {
+  public int[][] readIntMat(int m, int n) {
+    var mat = new int[m][n];
+    for (var row : mat) {
       readInts(row);
     }
     return mat;
   }
+
+  private void readDoubles(double[] a) {
+    for (int i = 0; i < a.length; i++) {
+      a[i] = readDouble();
+    }
+  }
+
+  /**
+   * Returns an <code>double[]</code> with the next <code>len</code> <code>double</code>s in the
+   * <code>InputStream</code>. Equivalent to setting every element in the array to be
+   * <code>readDouble</code>. <br>
+   * Terminates reading if the end of the <code>InputStream</code> or an <code>IOException</code>
+   * occurs.
+   * 
+   * @param len The length of the array.
+   * @return A <code>double[]</code> of length <code>len</code> filled with the next
+   *         <code>double</code>s in the <code>InputStream</code>.
+   */
+  public double[] readDoubles(int len) {
+    var a = new double[len];
+    readDoubles(a);
+    return a;
+  }
+
+  /**
+   * Returns an m by n <code>double[][]</code> with the next <code>double</code>s in the
+   * <code>InputStream</code>. Equivalent to calling <code>readDoubles</code> for every row in the 2d
+   * array. <br>
+   * Terminates reading if the end of the <code>InputStream</code> or an <code>IOException</code>
+   * occurs.
+   * 
+   * @param m The number of rows in the 2d array
+   * @param n The number of columns in the 2d array
+   * @return A matrix with m rows and n columns with the next m * n <code>double</code>s in the
+   *         <code>InputStream</code>.
+   */
+  public double[][] readDoubleMat(int m, int n) {
+    var mat = new double[m][n];
+    for (var row : mat) {
+      readDoubles(row);
+    }
+    return mat;
+  }
+
 
   private void readStringBuffers(StringBuffer[] a) {
     for (int i = 0; i < a.length; i++) {
@@ -236,8 +278,8 @@ public class BufferedScanner extends BufferedReader {
    * @return An <code>StringBuffer[]</code> of length <code>len</code> filled with the next
    *         <code>StringBuffer</code>s in the <code>InputStream</code>.
    */
-  public StringBuffer[] readStringBuffers(final int len) {
-    StringBuffer[] a = new StringBuffer[len];
+  public StringBuffer[] readStringBuffers(int len) {
+    var a = new StringBuffer[len];
     readStringBuffers(a);
     return a;
   }
@@ -254,9 +296,9 @@ public class BufferedScanner extends BufferedReader {
    * @return A matrix with m rows and n columns with the next m * n <code>StringBuffer</code>s in the
    *         <code>InputStream</code>.
    */
-  public StringBuffer[][] readStringBufferMat(final int m, final int n) {
-    StringBuffer[][] mat = new StringBuffer[m][n];
-    for (StringBuffer[] row : mat) {
+  public StringBuffer[][] readStringBufferMat(int m, int n) {
+    var mat = new StringBuffer[m][n];
+    for (var row : mat) {
       readStringBuffers(row);
     }
     return mat;
@@ -268,7 +310,7 @@ public class BufferedScanner extends BufferedReader {
    * @param args Not using command line arguments
    */
   public static void main(String[] args) {
-    BufferedScanner cin = new BufferedScanner();
+    var cin = new BufferedScanner();
 
     System.out.printf("double: %f%n", cin.readDouble());
     System.out.printf("strbuf: %s%n", cin.readStringBuffer());
@@ -282,7 +324,7 @@ public class BufferedScanner extends BufferedReader {
 
     int[][] m = cin.readIntMat(2, 3);
     System.out.println("int[][]:");
-    for (int[] row : m) {
+    for (var row : m) {
       for (int i : row) {
         System.out.printf("%d\t", i);
       }
@@ -290,6 +332,23 @@ public class BufferedScanner extends BufferedReader {
     }
 
     cin.close();
+  }
+
+  private static class Wrapper<T> {
+    private T t;
+
+    public Wrapper(T t) {
+      this.t = t;
+    }
+
+    public T get() {
+      return t;
+    }
+
+    public void set(T t) {
+      this.t = t;
+    }
+
   }
 
 }
