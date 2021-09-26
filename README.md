@@ -1,7 +1,7 @@
 # buffered-scanner
 ## Efficient and rich java scanner
-### - The convenience of `Scanner` combined with the efficiency of `BufferedReader`
-### - Great for hackathons
+- The convenience of `Scanner` combined with the efficiency of `BufferedReader`
+- Great for hackathons
 ### Documentation at https://milind-u.github.io/buffered-scanner/doc/BufferedScanner.html
 
 <br>
