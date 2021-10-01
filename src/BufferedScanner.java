@@ -11,8 +11,24 @@ import java.util.function.BiFunction;
  * class and the rich API of the <code>Scanner</code> class. Has been tested many times against the
  * <code>Scanner</code> class while reading many numbers or words, and <code>BufferedScanner</code>
  * has greatly outperformed <code>Scanner</code> in terms of elapsed time every time.
+ * 
+ * @author Milind Upadhyay
+ * 
  */
 public class BufferedScanner extends BufferedReader {
+
+  /**
+   * The value returned by <code>read</code> when a read failure occurs.
+   */
+  public static final int READ_FAILURE = -1;
+  /**
+   * The value for any whitespace being counted as a delimiter.
+   */
+  public static final int WHITESPACE_DELIM = 0;
+
+  private char delim;
+  private boolean done;
+  private IOException exception;
 
   /**
    * Creates a new <code>BufferedScanner</code> that will read from the given
@@ -22,6 +38,7 @@ public class BufferedScanner extends BufferedReader {
    */
   public BufferedScanner(InputStream in) {
     super(new InputStreamReader(in));
+    init();
   }
 
   /**
@@ -31,6 +48,13 @@ public class BufferedScanner extends BufferedReader {
    */
   public BufferedScanner(String path) {
     super(new InputStreamReader(newFileInputStream(path)));
+    init();
+  }
+
+  private void init() {
+    delim = WHITESPACE_DELIM;
+    done = false;
+    exception = null;
   }
 
   private static FileInputStream newFileInputStream(String path) {
@@ -51,24 +75,107 @@ public class BufferedScanner extends BufferedReader {
     this(System.in);
   }
 
+  /**
+   * Returns the delimiter
+   * 
+   * @return The delimiter of this scanner, or <code>WHITESPACE_DELIM</code> if whitespace is the only
+   *         delimiter.
+   */
+  public char getDelim() {
+    return delim;
+  }
+
+  /**
+   * Sets the delimiter of this scanner. If not called or <code>delim</code> is
+   * <code>WHITESPACE_DELIM</code>, whitespace will be the only delimiter. This delimiter and
+   * whitespace are used as a delimiter.
+   * 
+   * @param delim The delimiter to use, or <code>WHITESPACE_DELIM</code> to only use any whitespace
+   *        for a delimiter
+   */
+  public void setDelim(char delim) {
+    this.delim = delim;
+  }
+
+  /**
+   * Returns <code>true</code> if the stream has been fully read.
+   * 
+   * @return <code>true</code> if the scanner has finished reading, else <code>false</code>
+   */
+  public boolean isDone() {
+    return done;
+  }
+
+  /**
+   * Returns the last <code>IOException</code> encountered, or <code>null</code> if there is none.
+   * 
+   * @return The last <code>IOException</code> encountered, or <code>null</code> if all reads have
+   *         been successful.
+   */
+  public IOException getException() {
+    return exception;
+  }
+
+  /**
+   * Returns <code>true</code> if the stream can continue being read and all reads have been
+   * successful.
+   * 
+   * @return <code>true</code> if the scanner can continue reading, else <code>false</code>
+   */
+  public boolean isValid() {
+    return (!done && exception == null);
+  }
+
   @Override
   public void close() {
     try {
       super.close();
     } catch (IOException e) {
+      exception = e;
       e.printStackTrace();
     }
   }
 
+  /**
+   * Reads the next character in the buffer.
+   * 
+   * @return The next character, as an <code>int</code>, or <code>READ_FAILURE</code> if an
+   *         <code>IOException</code> occurred or <code>isDone()</code>.
+   */
   @Override
   public int read() {
-    int i = -1;
+    int i = READ_FAILURE;
     try {
       i = super.read();
+      done = (i == READ_FAILURE);
     } catch (IOException e) {
+      exception = e;
       e.printStackTrace();
+      i = READ_FAILURE;
     }
     return i;
+  }
+
+  /**
+   * Reads a line of text. A line is considered to be terminated by any one of a line feed ('\n'), a
+   * carriage return ('\r'), a carriage return followed immediately by a line feed, or by reaching the
+   * end-of-file(EOF).
+   * 
+   * @return A String containing the contents of the line, not including any line-termination
+   *         characters, or null if the end of the stream has been reached without reading any
+   *         characters or an <code>IOException</code> occurred.
+   */
+  @Override
+  public String readLine() {
+    String s = null;
+    try {
+      s = super.readLine();
+    } catch (IOException e) {
+      exception = e;
+      e.printStackTrace();
+      s = null;
+    }
+    return s;
   }
 
   private <T> T read(T t, BiFunction<T, Integer, T> add) {
@@ -79,13 +186,17 @@ public class BufferedScanner extends BufferedReader {
       i = read();
     }
 
-    // read till error or next whitespace
-    while ((i != -1) && !Character.isWhitespace(i)) {
+    // read until error or next whitespace
+    while ((i != READ_FAILURE) && !isDelim((char) i)) {
       t = add.apply(t, i);
       i = read();
     }
 
     return t;
+  }
+
+  private boolean isDelim(char c) {
+    return (Character.isWhitespace(c) || (c != WHITESPACE_DELIM && c == delim));
   }
 
   /**
@@ -224,7 +335,7 @@ public class BufferedScanner extends BufferedReader {
   }
 
   /**
-   * Returns an <code>double[]</code> with the next <code>len</code> <code>double</code>s in the
+   * Returns a <code>double[]</code> with the next <code>len</code> <code>double</code>s in the
    * <code>InputStream</code>. Equivalent to setting every element in the array to be
    * <code>readDouble</code>. <br>
    * Terminates reading if the end of the <code>InputStream</code> or an <code>IOException</code>
@@ -241,7 +352,7 @@ public class BufferedScanner extends BufferedReader {
   }
 
   /**
-   * Returns an m by n <code>double[][]</code> with the next <code>double</code>s in the
+   * Returns a m by n <code>double[][]</code> with the next <code>double</code>s in the
    * <code>InputStream</code>. Equivalent to calling <code>readDoubles</code> for every row in the 2d
    * array. <br>
    * Terminates reading if the end of the <code>InputStream</code> or an <code>IOException</code>
@@ -268,14 +379,14 @@ public class BufferedScanner extends BufferedReader {
   }
 
   /**
-   * Returns an <code>StringBuffer[]</code> with the next <code>len</code> <code>StringBuffer</code>s
+   * Returns a <code>StringBuffer[]</code> with the next <code>len</code> <code>StringBuffer</code>s
    * in the <code>InputStream</code>. Equivalent to setting every element in the array to be
    * <code>readStringBuffer</code>. <br>
    * Terminates reading if the end of the <code>InputStream</code> or an <code>IOException</code>
    * occurs.
    * 
    * @param len The length of the array.
-   * @return An <code>StringBuffer[]</code> of length <code>len</code> filled with the next
+   * @return A <code>StringBuffer[]</code> of length <code>len</code> filled with the next
    *         <code>StringBuffer</code>s in the <code>InputStream</code>.
    */
   public StringBuffer[] readStringBuffers(int len) {
