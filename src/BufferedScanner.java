@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -42,6 +43,15 @@ public class BufferedScanner extends BufferedReader {
   }
 
   /**
+   * Creates a new <code>BufferedScanner</code> that will read from the file with the given file.
+   *
+   * @param file The file to read from.
+   */
+  public BufferedScanner(File file) {
+    super(new InputStreamReader(newFileInputStream(file)));
+  }
+
+  /**
    * Creates a new <code>BufferedScanner</code> that will read from the file with the given path.
    * 
    * @param path The path of the file to read from.
@@ -55,6 +65,17 @@ public class BufferedScanner extends BufferedReader {
     delim = WHITESPACE_DELIM;
     done = false;
     exception = null;
+  }
+
+  private static FileInputStream newFileInputStream(File file) {
+    FileInputStream fis;
+    try {
+      fis = new FileInputStream(file);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+      fis = null;
+    }
+    return fis;
   }
 
   private static FileInputStream newFileInputStream(String path) {
@@ -78,8 +99,8 @@ public class BufferedScanner extends BufferedReader {
   /**
    * Returns the delimiter
    * 
-   * @return The delimiter of this scanner, or <code>WHITESPACE_DELIM</code> if whitespace is the only
-   *         delimiter.
+   * @return The delimiter of this scanner, or <code>WHITESPACE_DELIM</code> if whitespace is the
+   *         only delimiter.
    */
   public char getDelim() {
     return delim;
@@ -158,8 +179,8 @@ public class BufferedScanner extends BufferedReader {
 
   /**
    * Reads a line of text. A line is considered to be terminated by any one of a line feed ('\n'), a
-   * carriage return ('\r'), a carriage return followed immediately by a line feed, or by reaching the
-   * end-of-file(EOF).
+   * carriage return ('\r'), a carriage return followed immediately by a line feed, or by reaching
+   * the end-of-file(EOF).
    * 
    * @return A String containing the contents of the line, not including any line-termination
    *         characters, or null if the end of the stream has been reached without reading any
@@ -214,9 +235,9 @@ public class BufferedScanner extends BufferedReader {
    * Reads the next <code>int</code> in the <code>InputStream</code>, ignoring all non-digit
    * characters encountered except a '-' at the beginning.
    * 
-   * @return The next <code>int</code>, containing all the digits until the next whitespace character
-   *         in the <code>InputStream</code>, the end of the <code>InputStream</code>, or the
-   *         occurrence of an <code>IOException</code>.
+   * @return The next <code>int</code>, containing all the digits until the next whitespace
+   *         character in the <code>InputStream</code>, the end of the <code>InputStream</code>, or
+   *         the occurrence of an <code>IOException</code>.
    */
   public int readInt() {
     var negativeInt = new Wrapper<Boolean>(false);
@@ -270,8 +291,7 @@ public class BufferedScanner extends BufferedReader {
         decimalPow.set(0.1);
       } else if (Character.isDigit(j)) {
         final int digit = Character.getNumericValue(j);
-        result = (decimal.get() ? i : i * 10)
-            + (decimal.get() ? decimalPow.get() * digit : digit);
+        result = (decimal.get() ? i : i * 10) + (decimal.get() ? decimalPow.get() * digit : digit);
         if (decimal.get()) {
           decimalPow.set(decimalPow.get() / 10.0);
         }
@@ -353,8 +373,8 @@ public class BufferedScanner extends BufferedReader {
 
   /**
    * Returns a m by n <code>double[][]</code> with the next <code>double</code>s in the
-   * <code>InputStream</code>. Equivalent to calling <code>readDoubles</code> for every row in the 2d
-   * array. <br>
+   * <code>InputStream</code>. Equivalent to calling <code>readDoubles</code> for every row in the
+   * 2d array. <br>
    * Terminates reading if the end of the <code>InputStream</code> or an <code>IOException</code>
    * occurs.
    * 
@@ -404,8 +424,8 @@ public class BufferedScanner extends BufferedReader {
    * 
    * @param m The number of rows in the 2d array
    * @param n The number of columns in the 2d array
-   * @return A matrix with m rows and n columns with the next m * n <code>StringBuffer</code>s in the
-   *         <code>InputStream</code>.
+   * @return A matrix with m rows and n columns with the next m * n <code>StringBuffer</code>s in
+   *         the <code>InputStream</code>.
    */
   public StringBuffer[][] readStringBufferMat(int m, int n) {
     var mat = new StringBuffer[m][n];
