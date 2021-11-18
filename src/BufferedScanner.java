@@ -221,14 +221,14 @@ public class BufferedScanner extends BufferedReader {
   }
 
   /**
-   * Reads the next <code>StringBuffer</code> in the <code>InputStream</code>.
+   * Reads the next <code>StringBuilder</code> in the <code>InputStream</code>.
    * 
-   * @return The next <code>StringBuffer</code>, containing all the characters until the next
+   * @return The next <code>StringBuilder</code>, containing all the characters until the next
    *         whitespace character in the <code>InputStream</code>, the end of the
    *         <code>InputStream</code>, or the occurrence of an <code>IOException</code>
    */
-  public StringBuffer readStringBuffer() {
-    return read(new StringBuffer(), (sb, i) -> sb.append((char) i.intValue()));
+  public StringBuilder readString() {
+    return read(new StringBuilder(), (sb, i) -> sb.append((char) i.intValue()));
   }
 
   /**
@@ -392,45 +392,45 @@ public class BufferedScanner extends BufferedReader {
   }
 
 
-  private void readStringBuffers(StringBuffer[] a) {
+  private void readStrings(StringBuilder[] a) {
     for (int i = 0; i < a.length; i++) {
-      a[i] = readStringBuffer();
+      a[i] = readString();
     }
   }
 
   /**
-   * Returns a <code>StringBuffer[]</code> with the next <code>len</code> <code>StringBuffer</code>s
-   * in the <code>InputStream</code>. Equivalent to setting every element in the array to be
-   * <code>readStringBuffer</code>. <br>
+   * Returns a <code>StringBuilder[]</code> with the next <code>len</code>
+   * <code>StringBuilder</code>s in the <code>InputStream</code>. Equivalent to setting every
+   * element in the array to be <code>readString</code>. <br>
    * Terminates reading if the end of the <code>InputStream</code> or an <code>IOException</code>
    * occurs.
    * 
    * @param len The length of the array.
-   * @return A <code>StringBuffer[]</code> of length <code>len</code> filled with the next
-   *         <code>StringBuffer</code>s in the <code>InputStream</code>.
+   * @return A <code>StringBuilder[]</code> of length <code>len</code> filled with the next
+   *         <code>StringBuilder</code>s in the <code>InputStream</code>.
    */
-  public StringBuffer[] readStringBuffers(int len) {
-    var a = new StringBuffer[len];
-    readStringBuffers(a);
+  public StringBuilder[] readStrings(int len) {
+    var a = new StringBuilder[len];
+    readStrings(a);
     return a;
   }
 
   /**
-   * Returns an m by n <code>StringBuffer[][]</code> with the next <code>StringBuffer</code>s in the
-   * <code>InputStream</code>. Equivalent to calling <code>readStringBuffers</code> for every row in
+   * Returns an m by n <code>StringBuilder[][]</code> with the next <code>StringBuilder</code>s in
+   * the <code>InputStream</code>. Equivalent to calling <code>readStrings</code> for every row in
    * the 2d array. <br>
    * Terminates reading if the end of the <code>InputStream</code> or an <code>IOException</code>
    * occurs.
    * 
    * @param m The number of rows in the 2d array
    * @param n The number of columns in the 2d array
-   * @return A matrix with m rows and n columns with the next m * n <code>StringBuffer</code>s in
+   * @return A matrix with m rows and n columns with the next m * n <code>StringBuilder</code>s in
    *         the <code>InputStream</code>.
    */
-  public StringBuffer[][] readStringBufferMat(int m, int n) {
-    var mat = new StringBuffer[m][n];
+  public StringBuilder[][] readStringMat(int m, int n) {
+    var mat = new StringBuilder[m][n];
     for (var row : mat) {
-      readStringBuffers(row);
+      readStrings(row);
     }
     return mat;
   }
@@ -444,7 +444,7 @@ public class BufferedScanner extends BufferedReader {
     var cin = new BufferedScanner();
 
     System.out.printf("double: %f%n", cin.readDouble());
-    System.out.printf("strbuf: %s%n", cin.readStringBuffer());
+    System.out.printf("str: %s%n", cin.readString());
 
     int[] a = cin.readInts(4);
     System.out.print("int[]: ");

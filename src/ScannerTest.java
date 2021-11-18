@@ -1,4 +1,4 @@
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.Scanner;
@@ -15,7 +15,7 @@ public class ScannerTest {
   private static final String DOUBLES = "doubles.txt";
 
   private static double seconds(final long ns) {
-    return ((double) ns) / Math.pow(10, 9);
+    return ns / Math.pow(10, 9);
   }
 
   private static void writeDoubles() {
@@ -40,7 +40,7 @@ public class ScannerTest {
 
     Scanner s = null;;
     try {
-      s = new Scanner(new File(fileName));
+      s = new Scanner(new FileInputStream(fileName));
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
@@ -55,7 +55,7 @@ public class ScannerTest {
 
     start = System.nanoTime();
     var bs = new BufferedScanner(fileName);
-    read = (words ? bs::readStringBuffer : bs::readDouble);
+    read = (words ? bs::readString : bs::readDouble);
     for (int i = 0; i < READS; i++) {
       read.run();
     }
@@ -65,8 +65,8 @@ public class ScannerTest {
     bs.close();
 
     final double timeDiff = Math.abs(bufScannerTime - scannerTime);
-    final double pctDiff = (Math.min(scannerTime, bufScannerTime)
-        / Math.max(scannerTime, bufScannerTime)) * 100.0;
+    final double pctDiff =
+        (Math.min(scannerTime, bufScannerTime) / Math.max(scannerTime, bufScannerTime)) * 100.0;
     System.out.printf("%sScanner was %fs better. (%f%% of the other)%n%n",
         bufScannerTime < scannerTime ? "Buffered" : "", timeDiff, pctDiff);
   }

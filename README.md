@@ -11,12 +11,12 @@
 ## Extreme performance boost
 ### Stats
 - Reading words from `moby_dick.txt`
-  - Scanner elapsed time: 0.320939s
-  - Buffered Scanner elapsed time: 0.154017s
-  - BufferedScanner was 0.166922s better. (47.989607% of Scanner's time)
+  - Scanner elapsed time: 0.119392s
+  - Buffered Scanner elapsed time: 0.039982s
+  - BufferedScanner was 0.079410s faster. (it took 33.488201% of Scanner's time)
 
 - Reading doubles from `doubles.txt`
-  - Scanner elapsed time: 1.865464s
-  - Buffered Scanner elapsed time: 0.259908s
-  - BufferedScanner was 1.605556s better. (13.932629% of Scanner's time)
+  - Scanner elapsed time: 0.665048s
+  - Buffered Scanner elapsed time: 0.106127s
+  - BufferedScanner was 1.605556s faster. (it took 15.957785% of Scanner's time)
 
